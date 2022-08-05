@@ -22,7 +22,7 @@ interface KeyDao {
     // DELETE
     ///////////////////////////////////////////////////////////////////////////
 
-    @Query("DELETE FROM $TABLE_KEY ORDER BY id DESC LIMIT 1")
+    @Query("DELETE FROM $TABLE_KEY WHERE id = (SELECT id FROM $TABLE_KEY ORDER BY id DESC LIMIT 1)")
     suspend fun deleteLatestKey()
 
     ///////////////////////////////////////////////////////////////////////////
