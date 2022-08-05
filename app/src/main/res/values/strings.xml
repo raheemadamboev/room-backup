@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Room Backup</string>
+
+    <!-- KeyList -->
+    <string name="keys">Keys</string>
+    <string name="add_key">Add key</string>
+    <string name="delete_key">Delete key</string>
 </resources>
