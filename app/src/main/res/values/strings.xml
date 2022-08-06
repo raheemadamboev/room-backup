@@ -5,4 +5,6 @@
     <string name="keys">Keys</string>
     <string name="add_key">Add key</string>
     <string name="delete_key">Delete key</string>
+    <string name="export_db">Export DB</string>
+    <string name="import_db">Import DB</string>
 </resources>

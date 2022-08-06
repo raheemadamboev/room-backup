@@ -1,15 +1,19 @@
 package xyz.teamgravity.roombackup.injection.provide
 
 import android.app.Application
-import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import xyz.teamgravity.roombackup.data.local.constant.KeyConst
-import xyz.teamgravity.roombackup.data.local.dao.KeyDao
-import xyz.teamgravity.roombackup.data.local.database.KeyDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExecutorCoroutineDispatcher
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.sync.Mutex
+import xyz.teamgravity.roombackup.data.local.database.KeyDatabaseProvider
+import xyz.teamgravity.roombackup.data.repository.BackupRepository
 import xyz.teamgravity.roombackup.data.repository.KeyRepository
+import java.util.concurrent.Executors
 import javax.inject.Singleton
 
 @Module
@@ -18,16 +22,36 @@ object ApplicationModule {
 
     @Provides
     @Singleton
-    fun provideKeyDatabase(application: Application): KeyDatabase =
-        Room.databaseBuilder(application, KeyDatabase::class.java, KeyConst.NAME)
-            .fallbackToDestructiveMigration()
-            .build()
+    fun provideKeyDatabaseProvider(application: Application): KeyDatabaseProvider = KeyDatabaseProvider(application)
 
     @Provides
     @Singleton
-    fun provideKeyDao(keyDatabase: KeyDatabase): KeyDao = keyDatabase.keyDao()
+    fun provideCoroutineScope(): CoroutineScope = CoroutineScope(SupervisorJob())
+
+    @Provides
+    fun provideMutex(): Mutex = Mutex()
 
     @Provides
     @Singleton
-    fun provideKeyRepository(keyDao: KeyDao): KeyRepository = KeyRepository(keyDao)
+    fun provideExecutorCoroutineDispatcher(): ExecutorCoroutineDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+
+    @Provides
+    @Singleton
+    fun provideKeyRepository(keyDatabaseProvider: KeyDatabaseProvider): KeyRepository = KeyRepository(keyDatabaseProvider)
+
+    @Provides
+    @Singleton
+    fun provideBackupRepository(
+        keyDatabaseProvider: KeyDatabaseProvider,
+        application: Application,
+        mutex: Mutex,
+        coroutineScope: CoroutineScope,
+        executorCoroutineDispatcher: ExecutorCoroutineDispatcher,
+    ): BackupRepository = BackupRepository(
+        provider = keyDatabaseProvider,
+        context = application,
+        mutex = mutex,
+        scope = coroutineScope,
+        dispatcher = executorCoroutineDispatcher
+    )
 }

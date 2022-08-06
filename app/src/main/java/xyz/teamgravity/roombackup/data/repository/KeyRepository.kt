@@ -2,13 +2,13 @@ package xyz.teamgravity.roombackup.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import xyz.teamgravity.roombackup.data.local.dao.KeyDao
+import xyz.teamgravity.roombackup.data.local.database.KeyDatabaseProvider
 import xyz.teamgravity.roombackup.data.mapper.toEntity
 import xyz.teamgravity.roombackup.data.mapper.toModel
 import xyz.teamgravity.roombackup.data.model.KeyModel
 
 class KeyRepository(
-    private val dao: KeyDao,
+    private val provider: KeyDatabaseProvider,
 ) {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -16,7 +16,7 @@ class KeyRepository(
     ///////////////////////////////////////////////////////////////////////////
 
     suspend fun insertKey(key: KeyModel) {
-        dao.insertKey(key.toEntity())
+        provider.keyDao().insertKey(key.toEntity())
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ class KeyRepository(
     ///////////////////////////////////////////////////////////////////////////
 
     suspend fun deleteLatestKey() {
-        dao.deleteLatestKey()
+        provider.keyDao().deleteLatestKey()
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -32,6 +32,6 @@ class KeyRepository(
     ///////////////////////////////////////////////////////////////////////////
 
     fun getAllKeys(): Flow<List<KeyModel>> {
-        return dao.getAllKeys().map { entities -> entities.map { it.toModel() } }
+        return provider.keyDao().getAllKeys().map { entities -> entities.map { it.toModel() } }
     }
 }
