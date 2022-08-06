@@ -57,6 +57,13 @@ class KeyListViewModel @Inject constructor(
         }
     }
 
+    fun onImport(uri: Uri) {
+        viewModelScope.launch {
+            backup.import(uri)
+            observe()
+        }
+    }
+
     private fun observe() {
         observeKeys()
     }

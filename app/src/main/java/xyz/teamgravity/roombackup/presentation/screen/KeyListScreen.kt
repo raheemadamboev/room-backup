@@ -21,9 +21,15 @@ fun KeyListScreen(
     viewmodel: KeyListViewModel = hiltViewModel(),
 ) {
     val exportLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument(Const.MIME_SQLITE3),
+        contract = ActivityResultContracts.CreateDocument("*/*"),
         onResult = { uri ->
             if (uri != null) viewmodel.onExport(uri)
+        }
+    )
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+        onResult = { uri ->
+            if (uri != null) viewmodel.onImport(uri)
         }
     )
 
@@ -75,7 +81,7 @@ fun KeyListScreen(
                 }
                 Spacer(modifier = Modifier.width(10.dp))
                 FilledTonalButton(
-                    onClick = {},
+                    onClick = { importLauncher.launch(arrayOf("*/*")) },
                     modifier = Modifier.weight(1F)
                 ) {
                     Text(text = stringResource(id = R.string.import_db))
